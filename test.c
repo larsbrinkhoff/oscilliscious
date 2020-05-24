@@ -6,12 +6,13 @@ int main (void)
 {
   int t0, i = 0, j = 0;
 
+  /* SDL_AUDIODRIVER=alsa AUDIODEV=hw:2 */
   init ();
 
 #if 1 /* Highest possible frequency.  Time divisor set to 50 us. */
   t0 = time (NULL);
   while (time (NULL) - t0 < 1) {
-    draw_point (0, 32768 + 30000 * cos (i * 3.141592653589793));
+    draw_to (0, 32768 + 30000 * cos (i * 3.141592653589793));
     i++;
   }
 #endif
@@ -19,8 +20,10 @@ int main (void)
 #if 1 /* Single sine wave phase shift. */
   t0 = time (NULL);
   while (time (NULL) - t0 < 10) {
+    draw_blank (0, 30000 * (1 + sin (j / 100.0)));
     for (i = 0; i <= 65535; i += 300)
-      draw_point (i, 30000 * (1 + sin (i / 10000.0 + j / 100.0)));
+      draw_to (i, 30000 * (1 + sin (i / 10000.0 + j / 100.0)));
+    draw_blank (65535, 30000 * (1 + sin (65535 / 10000.0 + j / 100.0)));
     j++;
   }
 #endif
@@ -28,8 +31,10 @@ int main (void)
 #if 1 /* Sine wave varying period. */
   t0 = time (NULL);
   while (time (NULL) - t0 < 10) {
+    draw_blank (0, 30000 * (1 + sin (0)));
     for (i = 0; i <= 65535; i += 300)
-      draw_point (i, 30000 * (1 + sin (i / (10000.0 + 7000 * sin (j / 20.0)))));
+      draw_to (i, 30000 * (1 + sin (i / (10000.0 + 7000 * sin (j / 20.0)))));
+    draw_blank (65535, 30000 * (1 + sin (65535 / (10000.0 + 7000 * sin (j / 20.0)))));
     j++;
   }
 #endif
@@ -37,8 +42,8 @@ int main (void)
 #if 1 /* Lissajous. */
   t0 = time (NULL);
   while (time (NULL) - t0 < 10) {
-    draw_point (32000 * (1 + cos (i / 20010.0)),
-                32000 * (1 + sin (i / 10000.0)));
+    draw_to (32000 * (1 + cos (i / 20010.0)),
+             32000 * (1 + sin (i / 10000.0)));
     i += 1000;
   }
 #endif
@@ -143,7 +148,7 @@ int main (void)
     x = y = z = 1;
     t0 = time (NULL);
     while (time (NULL) - t0 < 10) {
-      draw_point (32768 + 1200 * x, 32768 + 1200 * y);
+      draw_to (32768 + 1200 * x, 32768 + 1200 * y);
       dx = 10 * (y - x);
       dy = x * (28 - z) - y;
       dz = x * y - 8.0/3.0 * z;
@@ -169,7 +174,7 @@ int main (void)
       x >>= 18;
       x |= z << 18;
       x ^= v;
-      draw_point (x >> 20, y >> 20);
+      draw_to (x >> 20, y >> 20);
     }
   }
 #endif

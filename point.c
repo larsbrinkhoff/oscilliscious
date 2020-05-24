@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <SDL2/SDL.h>
 
+#define CHANNELS 4
+
 static SDL_AudioDeviceID dev;
 
 void init (void)
@@ -14,7 +16,7 @@ void init (void)
   SDL_memset(&want, 0, sizeof want);
   want.freq = 44100;
   want.format = AUDIO_S16SYS;
-  want.channels = 2;
+  want.channels = CHANNELS;
   want.samples = 4096;
   want.callback = NULL;
   want.userdata = NULL;
@@ -41,9 +43,9 @@ void init (void)
   }
 }
 
-void draw_point (int x, int y)
+void draw_xyz (int x, int y, int z)
 {
-  int16_t data[2];
+  int16_t data[CHANNELS];
 
   if (x < 0 || x > 65535 || y < 0 || x > 65535)
     return;
@@ -51,8 +53,10 @@ void draw_point (int x, int y)
   while (SDL_GetQueuedAudioSize (dev) > 44100)
     SDL_Delay (10);
 
+  memset (data, 0, sizeof data);
   data[0] = x - 32768;
   data[1] = y - 32768;
+  data[2] = z - 32768;
 
   SDL_QueueAudio (dev, data, sizeof data);
 }

@@ -3,6 +3,25 @@
 
 #define ABS(_X) ((_X) >= 0 ? (_X) : -(_X))
 
+void draw_to (int x, int y)
+{
+  draw_xyz (x, y, 65535);
+}
+
+void draw_blank (int x, int y)
+{
+  int i;
+  for (i = 0; i < 10; i++)
+    draw_xyz (x, y, 0);
+}
+
+void draw_point (int x, int y)
+{
+  draw_blank (x, y);
+  draw_point (x, y);
+  draw_blank (x, y);
+}
+
 void draw_line(int x1, int y1, int x2, int y2)
 {
 #if 1
@@ -17,17 +36,15 @@ void draw_line(int x1, int y1, int x2, int y2)
   x = x1 + .5;
   y = y1 + .5;
   
-  for (i = 0; i < 3; i++)
-    draw_point ((int)x, (int)y);
+  draw_blank ((int)x, (int)y);
 
   for (i = 0; i < (int)r; i += n) {
-    draw_point ((int)x, (int)y);
+    draw_to ((int)x, (int)y);
     x += n * dx;
     y += n * dy;
   }
 
-  for (i = 0; i < 3; i++)
-    draw_point ((int)x, (int)y);
+  draw_blank ((int)x, (int)y);
 
 #else
   int dx, dy;
@@ -63,7 +80,7 @@ void draw_line(int x1, int y1, int x2, int y2)
   y = y1;
   for (;;) {
     if ((++n % 200) == 0)
-      draw_point (x, y);
+      draw_to (x, y);
 
     if (x == ex || y == ey)
       break;
