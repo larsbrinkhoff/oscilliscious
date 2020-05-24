@@ -3,99 +3,72 @@
 
 #define ABS(_X) ((_X) >= 0 ? (_X) : -(_X))
 
+static int px = -1;
+static int py = -1;
+static int beam = 0;
+
 void draw_to (int x, int y)
 {
+  if (x == px && y == py && beam)
+    return;
   draw_xyz (x, y, 65535);
+  px = x;
+  py = y;
+  beam = 1;
 }
 
 void draw_blank (int x, int y)
 {
+  double dx, dy;
   int i;
-  for (i = 0; i < 10; i++)
-    draw_xyz (x, y, 0);
+  dx = x - px;
+  dy = y - py;
+  for (i = 0; i <= 8; i++)
+    draw_xyz (px + i * dx / 8 + .5, py + i * dy / 8 + .5, 0);
+  px = x;
+  py = y;
+  beam = 0;
 }
 
 void draw_point (int x, int y)
 {
   draw_blank (x, y);
-  draw_point (x, y);
-  draw_blank (x, y);
+  draw_xyz (x, y, 65535);
+  px = x;
+  py = y;
+  beam = 1;
 }
 
 void draw_line(int x1, int y1, int x2, int y2)
 {
-#if 1
   double x, y, dx, dy, r;
-  int i, n = 500;
+  int i, n = 3000;
   dx = x2 - x1;
   dy = y2 - y1;
   r = sqrt (dx * dx + dy * dy);
   dx /= r;
   dy /= r;
 
-  x = x1 + .5;
-  y = y1 + .5;
-  
-  draw_blank ((int)x, (int)y);
+  draw_blank ((int)(x1 + .5), (int)(y1 + .5));
 
-  for (i = 0; i < (int)r; i += n) {
-    draw_to ((int)x, (int)y);
-    x += n * dx;
-    y += n * dy;
-  }
-
-  draw_blank ((int)x, (int)y);
-
-#else
-  int dx, dy;
-  int xdx, xdy, ydx, ydy;
-  int x, y;
-  int ax, ay;
-  int ix, iy;
-  int ex, ey;
-  int n = 0;
-
-  dx = x2 - x1;
-  dy = y2 - y1;
-
-  xdx = ydx = ABS(dx);
-  xdy = ydy = ABS(dy);
-
-  ex = x2;
-  ey = y2;
-
-  if (ABS (dx) > ABS(dy)) {
-    xdx = xdy = 0;
-    ey = -1;
+  if (r <= n) {
+    draw_to (x1, y1);
+    draw_to (x2, y2);
   } else {
-    ydx = ydy = 0;
-    ex = -1;
+    for (i = 0; i <= (int)(r + .5); i += n) {
+      x = x1 + i * dx + .5;
+      y = y1 + i * dy + .5;
+      draw_to ((int)x, (int)y);
+    }
+
+    if (i - (int)(r + .5) > n / 4) {
+      x = x2 + .5;
+      y = y2 + .5;
+      draw_to ((int)x, (int)y);
+    }
   }
 
-  ix = dx >= 0 ? 1 : -1;
-  iy = dy >= 0 ? 1 : -1;
-
-  ax = ay = 0;
-  x = x1;
-  y = y1;
-  for (;;) {
-    if ((++n % 200) == 0)
-      draw_to (x, y);
-
-    if (x == ex || y == ey)
-      break;
-
-    if (ax >= 0) {
-      x += ix;
-      ax -= xdy;
-    } else
-      ax += xdx;
-
-    if (ay >= 0) {
-      y += iy;
-      ay -= ydx;
-    } else
-      ay += ydy;
-  }
-#endif
+  px = (int)x;
+  py = (int)y;
+  beam = 1;
 }
