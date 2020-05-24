@@ -48,6 +48,26 @@ int main (void)
   }
 #endif
 
+#if 1 /* Spirograph. */
+  {
+    double x1, y1, x2, y2, x3, y3;
+    j = -10;
+    t0 = time (NULL);
+    while (time (NULL) - t0 < 10) {
+      x1 = 32768 + 20000 * cos (i / 50.0);
+      y1 = 32768 + 20000 * sin (i / 50.0);
+      x2 = x1 + 10000 * cos (i / 50.0 * j);
+      y2 = y1 + 10000 * sin (i / 50.0 * j);
+      x3 = x2 + 2000 * cos (i / -1.0);
+      y3 = y2 + 2000 * sin (i / -1.0);
+      draw_to ((int)(x3 + .5), (int)(y3 + .5));
+      i++;
+      if ((i % 10000) == 0)
+        j++;
+    }
+  }
+#endif
+
 #if 1 /* Rotating square and line. */
   t0 = time (NULL);
   while (time (NULL) - t0 < 10) {
